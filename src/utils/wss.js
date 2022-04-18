@@ -1,6 +1,7 @@
 import io from "socket.io-client";
 import { setRoomId, setParticipants } from "../store/actions";
 import store from "../store/store";
+import * as webRTCHandler from "./webRTCHandler";
 
 const SERVER = "http://localhost:5002";
 
@@ -23,6 +24,26 @@ export const connectWithSockIOServer = () => {
     const { connectedUsers } = data;
     store.dispatch(setParticipants(connectedUsers));
   });
+
+  socket.on("conn-prepare", (data) => {
+    const { connUserSocketId } = data;
+    console.log("on conn-prepare", data);
+    webRTCHandler.prepareNewPeerConnection(connUserSocketId, false);
+
+    //inform the user which just join the room that we have prepared for incoming connection
+    socket.emit("conn-init", { connUserSocketId: connUserSocketId });
+  });
+
+  socket.on("conn-signal", (data) => {
+    console.log("on conn-signal", data);
+    webRTCHandler.handleSignalingData(data);
+  });
+
+  socket.on("conn-init", (data) => {
+    console.log("on conn-init", data);
+    const { connUserSocketId } = data;
+    webRTCHandler.prepareNewPeerConnection(connUserSocketId, true);
+  });
 };
 
 export const createNewRoom = (identity) => {
@@ -30,7 +51,6 @@ export const createNewRoom = (identity) => {
   const data = {
     identity,
   };
-
   socket.emit("create-new-room", data);
 };
 
@@ -42,4 +62,9 @@ export const joinRoom = (identity, roomId) => {
   };
 
   socket.emit("join-room", data);
+};
+
+export const signalPeerData = (data) => {
+  console.log("emiting conn-signal", data);
+  socket.emit("conn-signal", data);
 };
