@@ -2,10 +2,14 @@ import { setShowOverlay } from "../store/actions";
 import store from "../store/store";
 import * as wss from "./wss.js";
 import Peer from "simple-peer";
+import VideoSection from "../RoomPage/VideoSection/VideoSection";
 
 const defaultConstraints = {
   audio: true,
-  video: true,
+  video: {
+    width: "480",
+    height: "360",
+  },
 };
 
 let localStream;
@@ -87,6 +91,38 @@ export const handleSignalingData = (data) => {
   peers[data.connUserSocketId].signal(data.signal);
 };
 
+export const removePeerConnection = (data) => {
+  console.log("removePeerConnection");
+  const { socketId } = data;
+  const videoContainer = document.getElementById(socketId);
+  const videoEl = document.getElementById(`${socketId}-video`);
+  console.log(
+    "socketId",
+    socketId,
+    "videoContainer",
+    videoContainer,
+    "videoEl",
+    videoEl
+  );
+
+  if (videoContainer && videoEl) {
+    const tracks = videoEl.srcObject.getTracks();
+
+    tracks.forEach((t) => t.stop());
+
+    videoEl.srcObject = null;
+    videoContainer.removeChild(videoEl);
+
+    videoContainer.parentNode.removeChild(videoContainer);
+
+    console.log("peers", peers, "peers[socketId]", peers[socketId]);
+    if (peers[socketId]) {
+      peers[socketId].destroy();
+    }
+    delete peers[socketId];
+  }
+};
+
 /////////////////////////////// UI Videos ////////////////////////////
 const showLocalVideoPreview = (stream) => {
   //show local video preview
@@ -124,6 +160,55 @@ const addStream = (stream, connUserSocketId) => {
     videoElement.play();
   };
 
+  videoElement.addEventListener("click", () => {
+    if (videoElement.classList.contains("full_screen")) {
+      videoElement.classList.remove("full_screen");
+    } else {
+      videoElement.classList.add("full_screen");
+    }
+  });
+
   videoContainer.appendChild(videoElement);
   videosContainer.appendChild(videoContainer);
+};
+
+/////////////////////////////// Buttons logic ////////////////////////////
+
+export const toggleMic = (isMuted) => {
+  localStream.getAudioTracks()[0].enabled = isMuted ? true : false;
+};
+
+export const toggleCamera = (isDisabled) => {
+  localStream.getVideoTracks()[0].enabled = isDisabled ? true : false;
+};
+
+export const toggleScreenShare = (
+  isScreenSharingActive,
+  screenSharingStream = null
+) => {
+  if (isScreenSharingActive) {
+    switchVideoTracks(localStream);
+  } else {
+    switchVideoTracks(screenSharingStream);
+  }
+};
+
+const switchVideoTracks = (stream) => {
+  for (let socket_id in peers) {
+    for (let index in peers[socket_id].streams[0].getTracks()) {
+      for (let index2 in stream.getTracks()) {
+        if (
+          peers[socket_id].streams[0].getTracks()[index].kind ===
+          stream.getTracks()[index2].kind
+        ) {
+          peers[socket_id].replaceTrack(
+            peers[socket_id].streams[0].getTracks()[index],
+            stream.getTracks()[index2],
+            peers[socket_id].streams[0]
+          );
+          break;
+        }
+      }
+    }
+  }
 };
