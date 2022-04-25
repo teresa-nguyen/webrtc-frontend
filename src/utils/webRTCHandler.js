@@ -1,8 +1,7 @@
-import { setShowOverlay } from "../store/actions";
+import { setMessages, setShowOverlay } from "../store/actions";
 import store from "../store/store";
 import * as wss from "./wss.js";
 import Peer from "simple-peer";
-import VideoSection from "../RoomPage/VideoSection/VideoSection";
 
 const defaultConstraints = {
   audio: true,
@@ -52,6 +51,8 @@ const getConfiguration = () => {
   };
 };
 
+const messengerChannel = "messenger";
+
 export const prepareNewPeerConnection = (connUserSocketId, isInitiator) => {
   console.log(
     "prepareNewPeerConnection",
@@ -66,6 +67,7 @@ export const prepareNewPeerConnection = (connUserSocketId, isInitiator) => {
     initiator: isInitiator,
     config: configuration,
     stream: localStream,
+    channelName: messengerChannel,
   });
 
   peers[connUserSocketId].on("signal", (data) => {
@@ -83,6 +85,12 @@ export const prepareNewPeerConnection = (connUserSocketId, isInitiator) => {
 
     addStream(stream, connUserSocketId);
     streams = [...streams, stream];
+  });
+
+  peers[connUserSocketId].on("data", (data) => {
+    console.log("on peers[connUserSocketId] data", data);
+    const messageData = JSON.parse(data);
+    appendNewMessage(messageData);
   });
 };
 
@@ -210,5 +218,34 @@ const switchVideoTracks = (stream) => {
         }
       }
     }
+  }
+};
+
+/////////////////////////// Messages /////////////////////////////
+const appendNewMessage = (messageData) => {
+  const messages = store.getState().messages;
+  store.dispatch(setMessages([...messages, messageData]));
+};
+
+export const sendMessageUsingDataChannel = (messageContent) => {
+  //append this message locally
+  const identity = store.getState().identity;
+
+  const localMessageData = {
+    content: messageContent,
+    identity,
+    messageCreatedByMe: true,
+  };
+
+  appendNewMessage(localMessageData);
+
+  const messageData = {
+    content: messageContent,
+    identity,
+  };
+
+  const stringifiedMessageData = JSON.stringify(messageData);
+  for (let socketId in peers) {
+    peers[socketId].send(stringifiedMessageData);
   }
 };
