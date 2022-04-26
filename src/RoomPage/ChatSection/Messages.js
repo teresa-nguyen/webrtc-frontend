@@ -1,20 +1,20 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 
 const Message = ({ author, content, sameAuthor, messageCreatedByMe }) => {
   const alignClass = messageCreatedByMe
-    ? "message_align_right"
-    : "message_align_left";
+    ? 'message_align_right'
+    : 'message_align_left';
 
-  const authorText = messageCreatedByMe ? "You" : author;
+  const authorText = messageCreatedByMe ? 'You' : author;
 
   const contentAdditonalStyles = messageCreatedByMe
-    ? "message_right_styles"
-    : "message_left_styles";
+    ? 'message_right_styles'
+    : 'message_left_styles';
 
   return (
     <div className={`message_container ${alignClass}`}>
-      {!sameAuthor && <p className="message_title">{authorText}</p>}
+      {!sameAuthor && <p className='message_title'>{authorText}</p>}
       <p className={`message_content ${contentAdditonalStyles}`}>{content}</p>
     </div>
   );
@@ -22,7 +22,7 @@ const Message = ({ author, content, sameAuthor, messageCreatedByMe }) => {
 
 const Messages = ({ messages }) => {
   return (
-    <div className="messages_container">
+    <div className='messages_container'>
       {messages.map((message, index) => {
         const sameAuthor =
           index > 0 && message.identity === messages[index - 1].identity;

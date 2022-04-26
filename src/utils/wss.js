@@ -1,53 +1,58 @@
-import io from "socket.io-client";
-import { setRoomId, setParticipants } from "../store/actions";
-import store from "../store/store";
-import * as webRTCHandler from "./webRTCHandler";
+import io from 'socket.io-client';
+import { setRoomId, setParticipants, setMessages } from '../store/actions';
+import store from '../store/store';
+import * as webRTCHandler from './webRTCHandler';
 
-const SERVER = "http://localhost:5002";
+const SERVER = 'http://localhost:5002';
 
 let socket = null;
 
 export const connectWithSockIOServer = () => {
   socket = io(SERVER);
 
-  socket.on("connect", () => {
-    console.log("successfully connected with socket io server");
+  socket.on('connect', () => {
+    console.log('successfully connected with socket io server');
     console.log(socket.id);
   });
 
-  socket.on("room-id", (data) => {
+  socket.on('room-id', (data) => {
     const { roomId } = data;
     store.dispatch(setRoomId(roomId));
   });
 
-  socket.on("room-update", (data) => {
+  socket.on('room-update', (data) => {
     const { connectedUsers } = data;
     store.dispatch(setParticipants(connectedUsers));
   });
 
-  socket.on("conn-prepare", (data) => {
+  socket.on('conn-prepare', (data) => {
     const { connUserSocketId } = data;
-    console.log("on conn-prepare", data);
+    console.log('on conn-prepare', data);
     webRTCHandler.prepareNewPeerConnection(connUserSocketId, false);
 
     //inform the user which just join the room that we have prepared for incoming connection
-    socket.emit("conn-init", { connUserSocketId: connUserSocketId });
+    socket.emit('conn-init', { connUserSocketId: connUserSocketId });
   });
 
-  socket.on("conn-signal", (data) => {
-    console.log("on conn-signal", data);
+  socket.on('conn-signal', (data) => {
+    console.log('on conn-signal', data);
     webRTCHandler.handleSignalingData(data);
   });
 
-  socket.on("conn-init", (data) => {
-    console.log("on conn-init", data);
+  socket.on('conn-init', (data) => {
+    console.log('on conn-init', data);
     const { connUserSocketId } = data;
     webRTCHandler.prepareNewPeerConnection(connUserSocketId, true);
   });
 
-  socket.on("user-disconnected", (data) => {
-    console.log("on user-disconnected");
+  socket.on('user-disconnected', (data) => {
+    console.log('on user-disconnected');
     webRTCHandler.removePeerConnection(data);
+  });
+
+  socket.on('msg-broadcast', (data) => {
+    console.log('on msg-broadcast');
+    appendNewMessage(data);
   });
 };
 
@@ -56,7 +61,7 @@ export const createNewRoom = (identity) => {
   const data = {
     identity,
   };
-  socket.emit("create-new-room", data);
+  socket.emit('create-new-room', data);
 };
 
 export const joinRoom = (identity, roomId) => {
@@ -66,10 +71,30 @@ export const joinRoom = (identity, roomId) => {
     identity,
   };
 
-  socket.emit("join-room", data);
+  socket.emit('join-room', data);
 };
 
 export const signalPeerData = (data) => {
-  console.log("emiting conn-signal", data);
-  socket.emit("conn-signal", data);
+  console.log('emiting conn-signal', data);
+  socket.emit('conn-signal', data);
+};
+
+/////////////////////////// Messages /////////////////////////////
+const appendNewMessage = (messageData) => {
+  const messages = store.getState().messages;
+  store.dispatch(setMessages([...messages, messageData]));
+};
+
+export const sendMessage = (messageContent) => {
+  //append this message locally
+  const identity = store.getState().identity;
+
+  const messageData = {
+    content: messageContent,
+    identity,
+  };
+
+  appendNewMessage({ ...messageData, messageCreatedByMe: true });
+
+  socket.emit('msg-sent', messageData);
 };
