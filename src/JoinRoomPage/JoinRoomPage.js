@@ -1,27 +1,26 @@
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { connect } from "react-redux";
-import { setIsRoomHost } from "../store/actions";
-import JoinRoomTitle from "./JoinRoomTitle";
-import JoinRoomContent from "./JoinRoomContent";
-import "./JoinRoomPage.css";
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { setIsRoomHost } from '../store/actions';
+import JoinRoomContent from './JoinRoomContent';
+import './JoinRoomPage.css';
 
 const JoinRoomPage = (props) => {
   const { setIsRoomHostAction, isRoomHost } = props;
-
   const search = useLocation().search;
+  const titleText = isRoomHost ? 'Host meeting' : 'Join meeting';
 
   useEffect(() => {
-    const isRoomHost = new URLSearchParams(search).get("host");
+    const isRoomHost = new URLSearchParams(search).get('host');
     if (isRoomHost) {
       setIsRoomHostAction(true);
     }
   }, []);
 
   return (
-    <div className="join_room_page_container">
-      <div className="join_room_page_panel">
-        <JoinRoomTitle isRoomHost={isRoomHost} />
+    <div className='join_room_page_container'>
+      <div className='join_room_page_panel'>
+        <p className='join_room_title'>{titleText}</p>
         <JoinRoomContent />
       </div>
     </div>
