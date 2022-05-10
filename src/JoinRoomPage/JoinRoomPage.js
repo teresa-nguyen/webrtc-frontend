@@ -71,44 +71,53 @@ const JoinRoomPage = (props) => {
   }, []);
 
   return (
-    <Container maxWidth='sm'>
-      <Paper elevation={12} style={{ padding: '24px 120px' }}>
-        <Typography variant='h4' component='h1'>
-          {titleText}
-        </Typography>
-        <form>
-          {!isRoomHost && (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+      }}
+    >
+      <Container maxWidth='sm'>
+        <Paper elevation={12} style={{ padding: '24px 120px' }}>
+          <Typography variant='h4' component='h1'>
+            {titleText}
+          </Typography>
+          <form>
+            {!isRoomHost && (
+              <TextField
+                margin='normal'
+                label='Enter meeting ID'
+                variant='outlined'
+                value={roomIdValue}
+                onChange={handleRoomIdValueChange}
+              />
+            )}
             <TextField
               margin='normal'
-              label='Enter meeting ID'
+              label='Enter your Name'
               variant='outlined'
-              value={roomIdValue}
-              onChange={handleRoomIdValueChange}
+              value={nameValue}
+              onChange={handleNameValueChange}
             />
-          )}
-          <TextField
-            margin='normal'
-            label='Enter your Name'
-            variant='outlined'
-            value={nameValue}
-            onChange={handleNameValueChange}
-          />
-          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              style={{ marginRight: 12 }}
-              variant='contained'
-              onClick={handleJoinRoom}
-            >
-              {successButtonText}
-            </Button>
-            <Button variant='outlined' onClick={pushToIntroductionPage}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Paper>
-    </Container>
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                style={{ marginRight: 12 }}
+                variant='contained'
+                onClick={handleJoinRoom}
+              >
+                {successButtonText}
+              </Button>
+              <Button variant='outlined' onClick={pushToIntroductionPage}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Paper>
+      </Container>
+    </div>
   );
 };
 
