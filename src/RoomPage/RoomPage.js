@@ -12,6 +12,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Grid,
 } from '@mui/material';
 
 import './RoomPage.css';
@@ -32,9 +33,9 @@ const RoomPage = ({
   }, []);
 
   return (
-    <div className='room_container'>
-      {/* <ParticipantsSections /> */}
-      <Container maxWidth='xs'>
+    <Grid container spacing={2}>
+      <Grid item xs={3}>
+        {/* <ParticipantsSections /> */}
         <Typography variant='h6' component='h2'>
           PARTICIPANTS
         </Typography>
@@ -52,12 +53,16 @@ const RoomPage = ({
             );
           })}
         </List>
-      </Container>
-      <VideoSection />
-      <ChatSection />
+      </Grid>
+      <Grid item xs={6}>
+        <VideoSection />
+      </Grid>
+      <Grid item xs={3}>
+        <ChatSection />
+      </Grid>
       <RoomLabel roomId={roomId} />
       {showOverlay && <Overlay />}
-    </div>
+    </Grid>
   );
 };
 
