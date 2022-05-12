@@ -36,7 +36,7 @@ const RoomPage = ({
     <Grid container spacing={2}>
       <Grid item xs={3}>
         {/* <ParticipantsSections /> */}
-        <Typography variant='h6' component='h2'>
+        <Typography variant='h6' component='h2' style={{ paddingLeft: 16 }}>
           PARTICIPANTS
         </Typography>
         <List>
@@ -57,7 +57,16 @@ const RoomPage = ({
       <Grid item xs={6}>
         <VideoSection />
       </Grid>
-      <Grid item xs={3}>
+      <Grid
+        item
+        xs={3}
+        style={{
+          display: 'flex',
+          height: '100vh',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
         <ChatSection />
       </Grid>
       <RoomLabel roomId={roomId} />

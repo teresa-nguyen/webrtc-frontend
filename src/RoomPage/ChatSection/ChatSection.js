@@ -30,10 +30,10 @@ const ChatSection = ({ messages }) => {
 
   return (
     <>
-      <Typography variant='h6' component='h2'>
+      <Typography variant='h6' component='h2' style={{ paddingLeft: 16 }}>
         CHAT
       </Typography>
-      <List dense={true}>
+      <List dense={true} style={{ flexGrow: 1 }}>
         {messages.map((message, index) => {
           const sameAuthor =
             index > 0 && message.identity === messages[index - 1].identity;
@@ -53,7 +53,7 @@ const ChatSection = ({ messages }) => {
           );
         })}
       </List>
-      <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
+      <Box>
         <form onSubmit={sendMessage}>
           <TextField
             onChange={handleTextChange}
@@ -62,7 +62,12 @@ const ChatSection = ({ messages }) => {
             variant='standard'
             placeholder='Type your message...'
           />
-          <Button variant='contained' endIcon={<SendIcon />} type='submit'>
+          <Button
+            variant='contained'
+            endIcon={<SendIcon />}
+            type='submit'
+            size='small'
+          >
             Send
           </Button>
         </form>
