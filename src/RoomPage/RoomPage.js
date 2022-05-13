@@ -54,7 +54,7 @@ const RoomPage = ({
           })}
         </List>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={6} style={{ display: 'flex' }}>
         <VideoSection />
       </Grid>
       <Grid
