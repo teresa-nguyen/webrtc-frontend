@@ -54,7 +54,7 @@ const ChatSection = ({ messages }) => {
         })}
       </List>
       <Box>
-        <form onSubmit={sendMessage}>
+        <form autocomplete='off' onSubmit={sendMessage}>
           <TextField
             onChange={handleTextChange}
             value={message}
