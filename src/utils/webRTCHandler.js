@@ -129,9 +129,8 @@ export const removePeerConnection = (data) => {
 const showLocalVideoPreview = (stream) => {
   //show local video preview
   const videosContainer = document.getElementById('videos_portal');
-  videosContainer.classList.add('videos_portal_styles');
   const videoContainer = document.createElement('div');
-  videoContainer.classList.add('video_track_container');
+  videoContainer.style.flexBasis = '50%';
   const videoElement = document.createElement('video');
   videoElement.autoplay = true;
   videoElement.muted = true;
@@ -150,9 +149,9 @@ const addStream = (stream, connUserSocketId) => {
   console.log('add stream', stream, connUserSocketId);
   const videosContainer = document.getElementById('videos_portal');
   const videoContainer = document.createElement('div');
+  videoContainer.style.flexBasis = '50%';
   videoContainer.id = connUserSocketId;
 
-  videoContainer.classList.add('video_track_container');
   const videoElement = document.createElement('video');
   videoElement.autoplay = true;
   videoElement.srcObject = stream;
