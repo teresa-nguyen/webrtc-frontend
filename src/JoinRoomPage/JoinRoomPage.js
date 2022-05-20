@@ -4,7 +4,14 @@ import { connect } from 'react-redux';
 import { setIsRoomHost, setIdentity, setRoomId } from '../store/actions';
 import { useHistory } from 'react-router-dom';
 import { getRoomExists } from '../utils/api';
-import { Container, Paper, Typography, TextField, Button } from '@mui/material';
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+} from '@mui/material';
 
 const JoinRoomPage = (props) => {
   const {
@@ -50,7 +57,8 @@ const JoinRoomPage = (props) => {
       setErrorMessage('Meeting not found. Check your meeting id.');
     }
   };
-  const handleJoinRoom = async () => {
+  const handleJoinRoom = async (event) => {
+    event.preventDefault();
     setIdentityAction(nameValue);
     if (isRoomHost) {
       createRoom();
@@ -74,46 +82,60 @@ const JoinRoomPage = (props) => {
     <div
       style={{
         display: 'flex',
-        justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
       }}
     >
       <Container maxWidth='sm'>
         <Paper elevation={12} style={{ padding: '24px 120px' }}>
-          <Typography variant='h4' component='h1'>
+          <Typography
+            variant='h4'
+            component='h1'
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
             {titleText}
           </Typography>
-          <form>
-            {!isRoomHost && (
-              <TextField
-                margin='normal'
-                label='Enter meeting ID'
-                variant='outlined'
-                value={roomIdValue}
-                onChange={handleRoomIdValueChange}
-              />
-            )}
-            <TextField
-              margin='normal'
-              label='Enter your Name'
-              variant='outlined'
-              value={nameValue}
-              onChange={handleNameValueChange}
-            />
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                style={{ marginRight: 12 }}
-                variant='contained'
-                onClick={handleJoinRoom}
-              >
-                {successButtonText}
-              </Button>
-              <Button variant='outlined' onClick={pushToIntroductionPage}>
-                Cancel
-              </Button>
-            </div>
+          <form autocomplete='off' onSubmit={handleJoinRoom}>
+            <Grid container>
+              <Grid item xs={12}>
+                {!isRoomHost && (
+                  <TextField
+                    fullWidth={true}
+                    margin='normal'
+                    label='Enter meeting ID'
+                    variant='outlined'
+                    value={roomIdValue}
+                    onChange={handleRoomIdValueChange}
+                  />
+                )}
+                <TextField
+                  fullWidth={true}
+                  margin='normal'
+                  label='Enter your Name'
+                  variant='outlined'
+                  value={nameValue}
+                  onChange={handleNameValueChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    variant='outlined'
+                    onClick={pushToIntroductionPage}
+                    style={{ marginRight: 12 }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant='contained' type='submit'>
+                    {successButtonText}
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
           </form>
         </Paper>
       </Container>
