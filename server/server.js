@@ -14,10 +14,6 @@ const server = http.createServer(app);
 
 app.use(cors());
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(parentPath, 'build', 'index.html'));
-});
-
 let connectedUsers = [];
 let rooms = [];
 
@@ -37,6 +33,10 @@ app.get('/api/room-exists/:roomId', (req, res) => {
     //send response that room does not exists
     return res.send({ roomExists: false });
   }
+});
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(parentPath, 'build', 'index.html'));
 });
 
 const io = require('socket.io')(server, {
